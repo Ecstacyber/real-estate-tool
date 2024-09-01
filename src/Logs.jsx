@@ -15,7 +15,7 @@ const siderStyle = {
   scrollbarColor: 'unset',
 };
 
-const App = () => {
+const Logs = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -23,7 +23,7 @@ const App = () => {
     <Layout hasSider>
       <Sider style={siderStyle}>
         <div className="demo-logo-vertical"></div>
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={navItems} />
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']} items={navItems} />
       </Sider>
       <Layout
         style={{
@@ -50,21 +50,7 @@ const App = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            <p>long content</p>
-            {
-              // indicates very long content
-              Array.from(
-                {
-                  length: 100,
-                },
-                (_, index) => (
-                  <React.Fragment key={index}>
-                    {index % 20 === 0 && index ? 'more' : '...'}
-                    <br />
-                  </React.Fragment>
-                ),
-              )
-            }
+            
           </div>
         </Content>
         <Footer
@@ -78,4 +64,5 @@ const App = () => {
     </Layout>
   );
 };
-export default App;
+
+export default Logs;
