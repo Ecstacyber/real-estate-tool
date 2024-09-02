@@ -1,7 +1,6 @@
 import {
     DashboardOutlined,
     DatabaseOutlined,
-    SettingOutlined,
     FileOutlined
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -19,11 +18,6 @@ const navItems = [
     },
     {
         key: '3',
-        icon: <SettingOutlined />,
-        label: <Link to="/site-config">Thêm website</Link>,
-    },
-    {
-        key: '4',
         icon: <FileOutlined />,
         label: <Link to="/logs">Logs</Link>,
     }

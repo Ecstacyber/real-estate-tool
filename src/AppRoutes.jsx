@@ -5,6 +5,8 @@ import App from './App.jsx';
 import RealEstateWebsites from "./RealEstateWebsites.jsx";
 import SiteConfig from "./SiteConfig.jsx";
 import Logs from "./Logs.jsx";
+import SiteDetails from "./SiteDetails.jsx";
+import LogDetails from "./LogDetails.jsx";
 
 const router = createBrowserRouter([
   {
@@ -16,12 +18,20 @@ const router = createBrowserRouter([
     element: <RealEstateWebsites />
   },
   {
+    path: '/real-estate-websites/:id',
+    element: <SiteDetails />
+  },
+  {
     path: '/site-config',
     element: <SiteConfig />
   },
   {
     path: '/logs',
     element: <Logs />
+  },
+  {
+    path: '/logs/:id',
+    element: <LogDetails />
   }
 ]);
 

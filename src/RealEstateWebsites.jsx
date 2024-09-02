@@ -1,13 +1,15 @@
 import React, { useState, useRef } from 'react';
-import { Layout, Menu, Button, Input, theme, Table, Modal, Space } from 'antd';
+import { Layout, Menu, Button, Input, theme, Table, Modal, Space, Form, TimePicker } from 'antd';
 import {
   EditOutlined,
   DeleteOutlined,
   SearchOutlined
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
+import dayjs from 'dayjs';
 import './index.css'
 import navItems from './NavItems';
+import { useNavigate } from 'react-router-dom';
 
 const { Header, Content, Footer, Sider } = Layout;
 const siderStyle = {
@@ -22,31 +24,41 @@ const siderStyle = {
 };
 
 const RealEstateWebsites = () => {
+  const [form] = Form.useForm();
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [addingWebsite, setAddingWebsite] = useState(null);
+  const [addingLinkSelector, setAddingLinkSelector] = useState(null);
   const [editingWebsite, setEditingWebsite] = useState(null);
+  const [editingLinkSelector, setEditingLinkSelector] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
+  const [formValues, setFormValues] = useState();
   const searchInput = useRef(null);
+  const navigate = useNavigate();
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
+
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText('');
     setDataSource([...dataSource]);
   };
+
   const [dataSource, setDataSource] = useState([
     {
       id: 1,
       name: 'https://batdongsan.vn/',
+      linkSelector: 'p'
     },
     {
       id: 2,
-      name: 'https://nhadat24h.net/'
+      name: 'https://nhadat24h.net/',
+      linkSelector: 'a'
     }
   ]);
 
@@ -150,6 +162,14 @@ const RealEstateWebsites = () => {
       key: "id",
       title: "STT",
       dataIndex: "id",
+      onCell: (record) => {
+        return {
+          onClick: () => {
+            navigate('./' + record.id);
+          }
+        }
+      },
+      width: '60px'
     },
     {
       key: "name",
@@ -161,9 +181,22 @@ const RealEstateWebsites = () => {
       sorter: (a, b) => a.name > b.name,
       sortDirections: ['descend', 'ascend'],
       ...getColumnSearchProps('name'),
+      onCell: (record) => {
+        return {
+          onClick: () => {
+            navigate('./' + record.id);
+          }
+        }
+      }
     },
     {
-      key: "3",
+      key: 'linkSelector',
+      title: 'Link selector',
+      dataIndex: 'linkSelector',
+      hidden: true
+    },
+    {
+      key: "action",
       title: "Hành động",
       render: (record) => {
         return (
@@ -197,7 +230,7 @@ const RealEstateWebsites = () => {
       okType: "danger",
       onOk: () => {
         setDataSource((pre) => {
-          return pre.filter((student) => student.id !== record.id);
+          return pre.filter((website) => website.id !== record.id);
         });
       },
     });
@@ -211,16 +244,29 @@ const RealEstateWebsites = () => {
   const resetEditing = () => {
     setIsEditing(false);
     setEditingWebsite(null);
+    setEditingLinkSelector(null);
   };
 
   const resetAdding = () => {
     setIsAdding(false);
     setAddingWebsite(null);
+    setAddingLinkSelector(null);
   }
+
+  const onCreate = (values) => {
+    console.log('Received values of form: ', values);
+    setFormValues(values);
+    setIsAdding(false);
+  };
+
+  const onCronjobChange = (time, timeString) => {
+    console.log(time, timeString);
+  };
 
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
   return (
     <Layout style={{ minHeight: "100vh" }} hasSider>
       <Sider style={siderStyle}>
@@ -252,42 +298,111 @@ const RealEstateWebsites = () => {
               borderRadius: borderRadiusLG,
             }}
           >
-            <Table columns={columns} dataSource={dataSource} title={() => 'Danh sách các website đang theo dõi'} showSorterTooltip={{ target: 'sorter-icon' }}></Table>
-            <div style={{ textAlign: 'right' }}>
+            <Table
+              columns={columns}
+              dataSource={dataSource}
+              rowKey={(record) => record.id}
+              title={() => 'Danh sách các website đang theo dõi'}
+              showSorterTooltip={{ target: 'sorter-icon' }}
+            >
+            </Table>
+            <div style={{ textAlign: 'right', paddingBottom: '20px' }}>
               <Button type="primary" onClick={onAddWebsite}>Thêm website</Button>
+            </div>
+            <div style={{ textAlign: 'right', paddingBottom: '20px' }}>
+              <Button type="primary" style={{ background: "green" }}>Lấy dữ liệu</Button>
+            </div>
+            <div style={{ textAlign: 'left', paddingBottom: '20px' }}>
+              <p>Đặt thời gian lấy dữ liệu định kỳ</p>
+              <TimePicker onChange={onCronjobChange} defaultOpenValue={dayjs('00:00:00', 'HH:mm:ss')} />
             </div>
             <Modal
               title="Thêm website"
               open={isAdding}
-              okText="Save"
+              okText="Lưu"
+              cancelText="Huỷ"
               onCancel={() => {
-                resetEditing();
+                resetAdding();
               }}
+              modalRender={(dom) => (
+                <Form
+                  layout="vertical"
+                  form={form}
+                  name="form_in_modal"
+                  initialValues={{ modifier: 'public' }}
+                  clearOnDestroy
+                >
+                  {dom}
+                </Form>
+              )}
               onOk={() => {
                 const newWebsite = {
                   id: dataSource.length + 1,
-                  name: addingWebsite.name
+                  name: addingWebsite.name,
+                  linkSelector: addingWebsite.linkSelector
                 }
                 setDataSource([...dataSource, newWebsite]);
                 resetAdding();
               }}
             >
-              <Input
-                value={addingWebsite?.name}
-                onChange={(e) => {
-                  setAddingWebsite((pre) => {
-                    return { ...pre, name: e.target.value };
-                  });
-                }}
-              />
+              <Form.Item
+                name="websiteLink"
+                label="Link website"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Hãy nhập link website',
+                  },
+                ]}
+              >
+                <Input
+                  value={addingWebsite?.name}
+                  onChange={(e) => {
+                    setAddingWebsite((pre) => {
+                      return { ...pre, name: e.target.value };
+                    });
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                name="linkSelector"
+                label="Link selector"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Hãy nhập link selector',
+                  },
+                ]}
+              >
+                <Input
+                  value={addingLinkSelector?.linkSelector}
+                  onChange={(e) => {
+                    setAddingLinkSelector((pre) => {
+                      return { ...pre, linkSelector: e.target.value };
+                    });
+                  }}
+                />
+              </Form.Item>
             </Modal>
             <Modal
               title="Sửa website"
               open={isEditing}
-              okText="Save"
+              okText="Lưu"
               onCancel={() => {
                 resetEditing();
               }}
+              modalRender={(dom) => (
+                <Form
+                  layout="vertical"
+                  form={form}
+                  name="edit-website-form"
+                  initialValues={{ modifier: 'public' }}
+                  clearOnDestroy
+                  onFinish={(values) => onCreate(values)}
+                >
+                  {dom}
+                </Form>
+              )}
               onOk={() => {
                 setDataSource((pre) => {
                   return pre.map((website) => {
@@ -301,14 +416,60 @@ const RealEstateWebsites = () => {
                 resetEditing();
               }}
             >
-              <Input
-                value={editingWebsite?.name}
+              {/* <Input
+                value={addingWebsite?.name}
                 onChange={(e) => {
                   setEditingWebsite((pre) => {
                     return { ...pre, name: e.target.value };
                   });
                 }}
               />
+              <Input
+                value={addingLinkSelector?.linkSelector}
+                onChange={(e) => {
+                  setEditingLinkSelector((pre) => {
+                    return { ...pre, linkSelector: e.target.value };
+                  });
+                }}
+              /> */}
+              <Form.Item
+                name="websiteLink"
+                label="Link website"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Hãy nhập link website',
+                  },
+                ]}
+              >
+                <Input
+                  value={editingWebsite?.name}
+                  onChange={(e) => {
+                    setEditingWebsite((pre) => {
+                      return { ...pre, name: e.target.value };
+                    });
+                  }}
+                />
+              </Form.Item>
+              <Form.Item
+                name="linkSelector"
+                label="Link selector"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Hãy nhập link selector',
+                  },
+                ]}
+              >
+                <Input
+                  value={editingWebsite?.linkSelector}
+                  onChange={(e) => {
+                    setEditingLinkSelector((pre) => {
+                      return { ...pre, linkSelector: e.target.value };
+                    });
+                  }}
+                />
+              </Form.Item>
             </Modal>
           </div>
         </Content>
