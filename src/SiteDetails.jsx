@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Layout, Menu, Button, Input, theme, Table, Space } from 'antd';
 import {
     SearchOutlined
@@ -22,6 +22,13 @@ const siderStyle = {
 const SiteDetails = () => {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [tableParams, setTableParams] = useState({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+  });
     const searchInput = useRef(null);
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -36,29 +43,57 @@ const SiteDetails = () => {
         setDataSource([...dataSource]);
     };
 
-    const [dataSource, setDataSource] = useState([
-        {
-            id: 1,
-            title: 'GIÁ SIÊU TỐT ĐƯỜNG MỸ ĐÌNH - 3.5 TỶ 31.3m2 - NHÀ XÂY MỚI - LÔ GÓC',
-            price: '3 500 000 000',
-            area: '32 m2',
-            legal: 'Sổ đỏ/Sổ hồng',
-            province: 'Hà Nội',
-            district: 'Nam Từ Liêm',
-            type: 'Nhà'
-        },
-        {
-            id: 2,
-            title: 'Bán Nhà Hoà Hảo Quận 10 Phường 4.',
-            price: '8 700 000 000',
-            area: '42 m2',
-            legal: 'Sổ đỏ/Sổ hồng',
-            province: 'Hồ Chí Minh',
-            district: 'Quận 10',
-            type: 'Nhà'
-        }
-    ]);
+    // const [dataSource, setDataSource] = useState([
+    //     {
+    //         id: 1,
+    //         title: 'GIÁ SIÊU TỐT ĐƯỜNG MỸ ĐÌNH - 3.5 TỶ 31.3m2 - NHÀ XÂY MỚI - LÔ GÓC',
+    //         price: '3 500 000 000',
+    //         area: '32 m2',
+    //         legal: 'Sổ đỏ/Sổ hồng',
+    //         province: 'Hà Nội',
+    //         district: 'Nam Từ Liêm',
+    //         type: 'Nhà'
+    //     },
+    //     {
+    //         id: 2,
+    //         title: 'Bán Nhà Hoà Hảo Quận 10 Phường 4.',
+    //         price: '8 700 000 000',
+    //         area: '42 m2',
+    //         legal: 'Sổ đỏ/Sổ hồng',
+    //         province: 'Hồ Chí Minh',
+    //         district: 'Quận 10',
+    //         type: 'Nhà'
+    //     }
+    // ]);
 
+    const [dataSource, setDataSource] = useState();
+
+    const fetchData = () => {
+    setLoading(true);
+    fetch(``)
+      .then((res) => res.json())
+      .then(({ results }) => {
+        setDataSource(results);
+        setLoading(false);
+        setTableParams({
+          ...tableParams,
+          pagination: {
+            ...tableParams.pagination,
+            total: results.length,
+          },
+        });
+      });
+    };
+    useEffect(() => {
+        fetchData();
+    }, [
+        tableParams.pagination?.current,
+        tableParams.pagination?.pageSize,
+        tableParams?.sortOrder,
+        tableParams?.sortField,
+        JSON.stringify(tableParams.filters),
+    ]);
+    
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
             <div
