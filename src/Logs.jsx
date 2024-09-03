@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Menu, Button, Input, theme, Table, Space } from 'antd';
 import {
-    SearchOutlined
+  SearchOutlined
 } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import './index.css'
@@ -25,6 +25,18 @@ const Logs = () => {
   const [searchedColumn, setSearchedColumn] = useState('');
   const navigate = useNavigate();
   const searchInput = useRef(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      console.log(loggedInUser);
+      setUser(loggedInUser);
+    }
+    else {
+      navigate('/login');
+    }
+  }, [navigate])
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -40,12 +52,12 @@ const Logs = () => {
 
   const [dataSource, setDataSource] = useState([
     {
-        id: 1,
-        name: '20240902_130000_cronjob'
+      id: 1,
+      name: '20240902_130000_cronjob'
     },
     {
-        id: 2,
-        name: '20240902_140000_cronjob'
+      id: 2,
+      name: '20240902_140000_cronjob'
     }
   ]);
 
@@ -53,41 +65,41 @@ const Logs = () => {
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
       <div
           style={{
-              padding: 8,
+            padding: 8,
           }}
           onKeyDown={(e) => e.stopPropagation()}
       >
         <Input
-            ref={searchInput}
-            placeholder={`Search ${dataIndex}`}
-            value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-            style={{
-                marginBottom: 8,
-                display: 'block',
-            }}
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+              marginBottom: 8,
+              display: 'block',
+          }}
         />
         <Space>
           <Button
-              type="primary"
-              onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-              icon={<SearchOutlined />}
-              size="small"
-              style={{
-                  width: 90,
-              }}
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+                width: 90,
+            }}
           >
-              Tìm
+            Tìm
           </Button>
           <Button
-              onClick={() => clearFilters && handleReset(clearFilters)}
-              size="small"
-              style={{
-                  width: 90,
-              }}
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+                width: 90,
+            }}
           >
-              Đặt lại
+            Đặt lại
           </Button>
           {/* <Button
           type="link"
@@ -103,76 +115,76 @@ const Logs = () => {
           Lọc
           </Button> */}
           <Button
-              type="link"
-              size="small"
-              onClick={() => {
-                  close();
-              }}
+            type="link"
+            size="small"
+            onClick={() => {
+                close();
+            }}
           >
-              Đóng
+            Đóng
           </Button>
         </Space>
       </div>
     ),
     filterIcon: (filtered) => (
-        <SearchOutlined
-          style={{
-              color: filtered ? '#1677ff' : undefined,
-          }}
-        />
+      <SearchOutlined
+        style={{
+          color: filtered ? '#1677ff' : undefined,
+        }}
+      />
     ),
     onFilter: (value, record) =>
-        record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
-        if (visible) {
-            setTimeout(() => searchInput.current?.select(), 100);
-        }
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
     },
     render: (text) =>
       searchedColumn === dataIndex ? (
         <Highlighter
-            highlightStyle={{
-                backgroundColor: '#ffc069',
-                padding: 0,
-            }}
-            searchWords={[searchText]}
-            autoEscape
-            textToHighlight={text ? text.toString() : ''}
+          highlightStyle={{
+            backgroundColor: '#ffc069',
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
         />
       ) : (
-          text
+        text
       ),
   });
 
   const columns = [
     {
-        key: "id",
-        title: "STT",
-        dataIndex: "id",
-        width: '60px',
+      key: "id",
+      title: "STT",
+      dataIndex: "id",
+      width: '60px',
     },
     {
-        key: "name",
-        title: "Tên",
-        dataIndex: "name",
-        showSorterTooltip: {
-            target: 'full-header',
-        },
-        sorter: (a, b) => a.name > b.name,
-        sortDirections: ['descend', 'ascend'],
-        ...getColumnSearchProps('name'),
-        onCell: (record) => {
-          return {
-            onClick: () => {
-              navigate('./' + record.id);
-            }
+      key: "name",
+      title: "Tên",
+      dataIndex: "name",
+      showSorterTooltip: {
+          target: 'full-header',
+      },
+      sorter: (a, b) => a.name > b.name,
+      sortDirections: ['descend', 'ascend'],
+      ...getColumnSearchProps('name'),
+      onCell: (record) => {
+        return {
+          onClick: () => {
+            navigate('./' + record.id);
           }
         }
+      }
     },
   ];
 
   const {
-      token: { colorBgContainer, borderRadiusLG },
+    token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
   return (

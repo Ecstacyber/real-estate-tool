@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Layout, Menu, Button, Input, theme, Table, Modal, Space, Form, TimePicker } from 'antd';
 import {
   EditOutlined,
@@ -35,7 +35,19 @@ const RealEstateWebsites = () => {
   const [searchedColumn, setSearchedColumn] = useState('');
   const [formValues, setFormValues] = useState();
   const searchInput = useRef(null);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      console.log(loggedInUser);
+      setUser(loggedInUser);
+    }
+    else {
+      navigate('/login');
+    }
+  }, [navigate])
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -328,7 +340,7 @@ const RealEstateWebsites = () => {
                 <Form
                   layout="vertical"
                   form={form}
-                  name="form_in_modal"
+                  name="add-website-modal"
                   initialValues={{ modifier: 'public' }}
                   clearOnDestroy
                 >
